@@ -10,16 +10,22 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "point.h"
+#include "courbes.h"
 
 int main(void)
 {
 	point_t P;
 	point_init(&P);
-	point_set_x(&P,"10",10);
-	point_set_y(&P,"5",10);
-	point_print(&P,"P");
-	point_set_xy(&P,"5","10",10);
-	point_print(&P,"P");
-	point_clear(&P);
+
+	equation_t E;
+	point_t Q;
+	point_init(&Q);
+	equation_init_set(&E,"0","0","0","1","1",16);
+
+
+	oppose_point(&E,&P,&Q);
+
+	point_print(&P, "P");
+	point_print(&Q, "Q");
 	return EXIT_SUCCESS;
 }

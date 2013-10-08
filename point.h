@@ -10,14 +10,17 @@
 
 #include <gmp.h>
 
+
+typedef int  bases_t[163] ;
+
 /**
  * @struct : point_type
  * @brief : define the type point_t
  * @members : coordinates of point _x and _y
  */
 typedef struct {
-	mpz_t _x;
-	mpz_t _y;
+	bases_t _x;
+	bases_t _y;
 } point_t;
 
 typedef point_t* ptr_point_t;
@@ -42,11 +45,9 @@ void point_clear (ptr_point_t P);
 void point_print (ptr_point_t P, char * name);
 
 
-void point_set_x (ptr_point_t P, const char * value_x, int base);
+void bases_add (bases_t a, bases_t b, bases_t c);
 
-void point_set_y (ptr_point_t P, const char * value_y, int base);
-
-void point_set_xy (ptr_point_t P, const char * value_x, const char * value_y, int base);
+void bases_mul (bases_t a, bases_t b, bases_t c);
 
 
 #endif /* POINT_H_ */

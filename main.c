@@ -37,18 +37,18 @@ int main(void)
 //	point_print(&Q, "Q");
 //	point_print(&Result, "R");
 	int *f;
-	f = malloc(sizeof(int) * (4*7+1));
-	F(4,7,17,f);
-	for(i = 1; i < 4*7+1; ++i)
-		printf("F(%d) = %d \n",i,f[i]);
+	int p = T * M + 1;
+	f = malloc(sizeof(int) * (p));
+	bases_mul_F(f);
 	bases_t a = {1,0,1,0,1,1,1};
 	bases_t b = {1,1,0,0,0,0,1};
 	bases_t c;
-	bases_mul(4,7,a,b,c,f);
-	for(i = 0; i < 7; ++i)
-	{
-		printf("c(%d) = %d \n",i,c[i]);
-	}
+	bases_mul(a,b,c,f);
+	bases_print(a,"A");
+	printf("  *  ");
+	bases_print(b,"B");
+	printf("  =  ");
+	bases_print(c,"C");
 	free(f);
 	return EXIT_SUCCESS;
 }

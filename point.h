@@ -11,7 +11,9 @@
 #include <gmp.h>
 
 
-typedef int  bases_t[163] ;
+#define M 7
+
+typedef int  bases_t[7] ;
 
 /**
  * @struct : point_type
@@ -47,7 +49,12 @@ void point_print (ptr_point_t P, char * name);
 
 void bases_add (bases_t a, bases_t b, bases_t c);
 
-void bases_mul (bases_t a, bases_t b, bases_t c);
+void bases_mul (int T, int m, bases_t a, bases_t b, bases_t c, int *f);
 
+void F (int T, int m, int u, int* f);
+
+int F_uv (int T, int m, bases_t u, bases_t v, int* f);
+
+void left_shift(int * tab);
 
 #endif /* POINT_H_ */

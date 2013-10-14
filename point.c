@@ -27,7 +27,7 @@ void point_print (ptr_point_t Point, char * name)
 	printf("%s ( X = [",name);
 	for(i = 0; i < 162; ++i)
 	{
-		printf("%d,",Point->_x[i]);
+		printf("%d",Point->_x[i]);
 	}
 	printf("%d];",Point->_x[162]);
 	printf(" Y = [");

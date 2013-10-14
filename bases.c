@@ -6,7 +6,8 @@
  */
 
 #include "bases.h"
-
+#include <gmp.h>
+#include <stdio.h>
 
 void bases_add (bases_t a, bases_t b, bases_t c)
 {
@@ -80,13 +81,27 @@ void bases_mul_left_shift(int * tab)
 	tab[M-1] = memo;
 }//bases_mul_left_shift()
 
-void bases_print(bases_t a, char * name)
+void bases_print(bases_t a)
 {
 	int i = 0;
-	printf("%s (",name);
-	for(i = 0; i < M - 1; ++i)
+	for(i = 0; i < M; ++i)
 	{
-		printf("%d, ",a[i]);
+		printf("%d",a[i]);
 	}
-	printf("%d)",a[M-1]);
 }//bases_print()
+
+void bases_to_string(bases_t a, char * str)
+{
+	int i = 0;
+	*str = NULL;
+	for(i = 0; i < M; ++i)
+	{
+		sprintf(str, "%s%d",str, a[i]);
+
+	}
+}//bases_print()
+
+void bases_to_int (char *var, mpz_t val)
+{
+	mpz_init_set_str(val,var,2);
+}

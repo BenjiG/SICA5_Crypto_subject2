@@ -14,41 +14,49 @@
 
 int main(void)
 {
-//	point_t P;
-//	point_init(&P);
-//
-//	point_t Q;
-//	point_init(&Q);
-//
-//	point_t Result;
-//	point_init(&Result);
-//
-//
-//
+	point_t P;
+	point_init(&P);
+
+	point_t Q;
+	point_init(&Q);
+
+	point_t Result;
+	point_init(&Result);
+
+
 	int i;
-//	for (i = 0; i < 163; ++i)
-//	{
-//		P._x[i] = rand() % 2;
-//		Q._x[i] = rand() % 2;
-//	}
-//
-//	bases_add(P._x,Q._x,Result._x);
-//	point_print(&P, "P");
-//	point_print(&Q, "Q");
-//	point_print(&Result, "R");
+	for (i = 0; i < 163; ++i)
+	{
+		P._x[i] = rand() % 2;
+		Q._x[i] = rand() % 2;
+	}
+
+	bases_add(P._x,Q._x,Result._x);
+	point_print(&P, "P");
+	point_print(&Q, "Q");
+	point_print(&Result, "R");
 	int *f;
 	int p = T * M + 1;
 	f = malloc(sizeof(int) * (p));
 	bases_mul_F(f);
-	bases_t a = {1,0,1,0,1,1,1};
-	bases_t b = {1,1,0,0,0,0,1};
+//	bases_t a = {1,0,1,0,1,1,1};
+//	bases_t b = {1,1,0,0,0,0,1};
 	bases_t c;
-	bases_mul(a,b,c,f);
-	bases_print(a,"A");
-	printf("  *  ");
-	bases_print(b,"B");
-	printf("  =  ");
-	bases_print(c,"C");
+	bases_mul(P._x,Q._x,c,f);
+//	bases_print(a,"A");
+//	printf("  *  ");
+//	bases_print(b,"B");
+//	printf("  =  ");
+	bases_print(c);
+
+	printf("\n");
+	char str [2048];
+	bases_to_string(c,str);
+
+	printf("%s\n",str);
+	mpz_t test;
+	bases_to_int(str,test);
+	gmp_printf("%Zd",test);
 	free(f);
 	return EXIT_SUCCESS;
 }

@@ -8,7 +8,9 @@
 #ifndef BASES_H_
 #define BASES_H_
 
-#define M 7
+#include <gmp.h>
+
+#define M 163
 
 #define T 4
 
@@ -29,5 +31,8 @@ int bases_mul_F_uv (bases_t u, bases_t v, int* f);
 
 void bases_mul_left_shift(int * tab);
 
+void bases_to_int (char * a, mpz_t val);
+
+void bases_to_string(bases_t a, char * str);
 
 #endif /* BASES_H_ */

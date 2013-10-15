@@ -23,40 +23,30 @@ int main(void)
 	point_t Result;
 	point_init(&Result);
 
+	curve_t E;
+	bases_init(E._a1);bases_init(E._a2);bases_init(E._a3);bases_init(E._a4);bases_init(E._a6);
+
+	int *f;
+	int p = T * M + 1;
+	f = malloc(sizeof(int) * (p));
+	bases_mul_F(f);
 
 	int i;
 	for (i = 0; i < 163; ++i)
 	{
 		P._x[i] = rand() % 2;
 		Q._x[i] = rand() % 2;
+		P._y[i] = rand() % 2;
+		Q._y[i] = rand() % 2;
 	}
 
-	bases_add(P._x,Q._x,Result._x);
 	point_print(&P, "P");
 	point_print(&Q, "Q");
+	addition_point_CE(f,&E,&P,&Q,&Result);
 	point_print(&Result, "R");
-	int *f;
-	int p = T * M + 1;
-	f = malloc(sizeof(int) * (p));
-	bases_mul_F(f);
-//	bases_t a = {1,0,1,0,1,1,1};
-//	bases_t b = {1,1,0,0,0,0,1};
-	bases_t c;
-	bases_mul(P._x,Q._x,c,f);
-//	bases_print(a,"A");
-//	printf("  *  ");
-//	bases_print(b,"B");
-//	printf("  =  ");
-	bases_print(c);
 
-	printf("\n");
-	char str [2048];
-	bases_to_string(c,str);
-
-	printf("%s\n",str);
-	mpz_t test;
-	bases_to_int(str,test);
-	gmp_printf("%Zd",test);
+	oppose_point_CE(f,&E,&P,&Result);
+	point_print(&Result, "R");
 	free(f);
 	return EXIT_SUCCESS;
 }

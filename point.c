@@ -8,33 +8,33 @@
 #include <gmp.h>
 
 #include "point.h"
-
+#include <stdlib.h>
+#include <stdio.h>
 
 void point_init (ptr_point_t Point)
 {
-	int i;
-	for(i = 0; i < 163; ++i){
-		Point->_x[i] = 0;
-		Point->_y[i] = 0;
-	}
-
+	bases_init(Point->_x);
+	bases_init(Point->_y);
 }//point_init()
 
 void point_print (ptr_point_t Point, char * name)
 {
-
-	int i;
 	printf("%s ( X = [",name);
-	for(i = 0; i < 162; ++i)
-	{
-		printf("%d",Point->_x[i]);
-	}
+	bases_print(Point->_x);
 	printf("%d];",Point->_x[162]);
 	printf(" Y = [");
-	for(i = 0; i < 162; ++i)
-	{
-		printf("%d,",Point->_y[i]);
-	}
+	bases_print(Point->_y);
 	printf("%d])\n",Point->_y[162]);
 }//point_print()
 
+int point_equal (ptr_point_t PointA, ptr_point_t PointB)
+{
+	return (bases_equal(PointA->_x,PointB->_x) && bases_equal(PointA->_y,PointB->_y));
+}//point_equal()
+
+//PointA = PointB
+void point_set_point (ptr_point_t PointA, ptr_point_t PointB)
+{
+	bases_set_bases(PointA->_x, PointB->_x);
+	bases_set_bases(PointA->_y,PointB->_y);
+}//point_set_point()

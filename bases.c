@@ -7,7 +7,26 @@
 
 #include "bases.h"
 #include <gmp.h>
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+void bases_init(bases_t a)
+{
+	int i;
+	for(i = 0; i < M; ++i)
+		a[i] = 0;
+}//bases_init()
+
+int bases_equal(bases_t a, bases_t b)
+{
+	int i;
+	for(i = 0; i < M; ++i)
+		if(a[i] != b[i])return 0;
+	return 1;
+}//bases_equal()
 
 void bases_add (bases_t a, bases_t b, bases_t c)
 {
@@ -90,18 +109,69 @@ void bases_print(bases_t a)
 	}
 }//bases_print()
 
-void bases_to_string(bases_t a, char * str)
+void bases_to_string(bases_t a, char *str)
 {
 	int i = 0;
-	*str = NULL;
 	for(i = 0; i < M; ++i)
 	{
 		sprintf(str, "%s%d",str, a[i]);
-
 	}
-}//bases_print()
+}//bases_to_string()
 
-void bases_to_int (char *var, mpz_t val)
+void string_to_int (char *string, mpz_t integer)
 {
-	mpz_init_set_str(val,var,2);
-}
+	mpz_init_set_str(integer,string,2);
+}//bases_to_int()
+
+void int_to_string (mpz_t integer, char *string)
+{
+	mpz_get_str(string,2,integer);
+}//int_to_bases()
+
+void string_to_bases(bases_t a, char *str)
+{
+	int i = 0;
+	for(i = 0; i < strlen(str); ++i)
+		a[i] = str[i] - '0';
+	for(i = strlen(str); i < M; ++i)
+		a[i] = 0;
+}//string_to_bases()
+
+void bases_to_int(bases_t bases, mpz_t integer)
+{
+	char str [1024];
+	bases_to_string(bases,str);
+	string_to_int(str,integer);
+}//bases_to_int()
+
+void int_to_bases(mpz_t integer, bases_t bases)
+{
+	char str [1024];
+	int_to_string(integer,str);
+	string_to_bases(bases,str);
+}//int_to_bases()
+
+void bases_inverse(bases_t bases, bases_t bases_inv)
+{
+	mpz_t integer;
+	mpz_t integer_inv;
+	mpz_t n;
+
+	bases_to_int(bases,integer);
+	//gmp_printf("%Zd\n",integer);
+	//calculer l'inverse de integer modulo M
+	mpz_init_set_ui(n,M);
+	mpz_init(integer_inv);
+	mpz_invert(integer_inv,integer,n);
+	//gmp_printf("%Zd\n",integer_inv);
+	int_to_bases(integer_inv, bases_inv);
+}//bases_inverse()
+
+
+//bases_a = bases_b
+void bases_set_bases(bases_t bases_a, bases_t bases_b)
+{
+	int i;
+	for(i = 0; i < M; ++i)
+		bases_a[i] = bases_b[i];
+}//bases_set_bases()

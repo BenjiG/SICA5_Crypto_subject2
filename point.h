@@ -43,4 +43,8 @@ void point_clear (ptr_point_t Point);
 void point_print (ptr_point_t Point, char * name);
 
 
+int point_equal (ptr_point_t PointA, ptr_point_t PointB);
+
+void point_set_point (ptr_point_t PointA, ptr_point_t PointB);
+
 #endif /* POINT_H_ */

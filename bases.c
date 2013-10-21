@@ -5,13 +5,13 @@
  *      Author: sanchez
  */
 
-#include "bases.h"
 #include <gmp.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "bases.h"
 
 void bases_init(bases_t a)
 {
@@ -57,7 +57,7 @@ void bases_mul_F (int *f)
 	}
 }//bases_mul_F()
 
-int bases_mul_F_uv (bases_t u, bases_t v, int* f)
+int bases_mul_F_uv (bases_t u, bases_t v)
 {
 	int p = T * M + 1;
 	int k = 1;
@@ -69,7 +69,7 @@ int bases_mul_F_uv (bases_t u, bases_t v, int* f)
 	return result % 2;
 }//bases_mul_F_uv()
 
-void bases_mul (bases_t a, bases_t b, bases_t c, int *f)
+void bases_mul (bases_t a, bases_t b, bases_t c)
 {
 	//
 	bases_t u, v;
@@ -82,7 +82,7 @@ void bases_mul (bases_t a, bases_t b, bases_t c, int *f)
 
 	for (k = 0; k < M; ++k)
 	{
-		c[k] = bases_mul_F_uv(u,v,f);
+		c[k] = bases_mul_F_uv(u,v);
 		bases_mul_left_shift(u);
 		bases_mul_left_shift(v);
 	}
@@ -98,6 +98,17 @@ void bases_mul_left_shift(int * tab)
 		tab[i]=tab[i+1];
 	}
 	tab[M-1] = memo;
+}//bases_mul_left_shift()
+
+void bases_mul_rg_shift(int * tab)
+{
+	int memo = tab[M-1];
+	int i = 0;
+	for(i = M-2; i > 1; --i)
+	{
+		tab[i]=tab[i-1];
+	}
+	tab[0] = memo;
 }//bases_mul_left_shift()
 
 void bases_print(bases_t a)
@@ -153,18 +164,20 @@ void int_to_bases(mpz_t integer, bases_t bases)
 
 void bases_inverse(bases_t bases, bases_t bases_inv)
 {
-	mpz_t integer;
-	mpz_t integer_inv;
-	mpz_t n;
-
-	bases_to_int(bases,integer);
-	//gmp_printf("%Zd\n",integer);
-	//calculer l'inverse de integer modulo M
-	mpz_init_set_ui(n,M);
-	mpz_init(integer_inv);
-	mpz_invert(integer_inv,integer,n);
-	//gmp_printf("%Zd\n",integer_inv);
-	int_to_bases(integer_inv, bases_inv);
+	bases_t z, y;
+	int k = 0;
+	bases_init(z);bases_init(y);
+	bases_set_bases(y,bases);
+	for(k = 0; k < M-2; ++k)
+	{
+		//bases_mul(y,y,z);
+		bases_set_bases(z,y);
+		bases_mul_left_shift(z);
+		bases_mul(z,bases,y);
+	}
+	//bases_mul(y,y,bases_inv);
+	bases_mul_left_shift(y);
+	bases_set_bases(bases_inv,y);
 }//bases_inverse()
 
 

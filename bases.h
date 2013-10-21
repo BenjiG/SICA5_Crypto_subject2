@@ -14,11 +14,12 @@
 
 #define T 4
 
-#define U 17
+#define U 504 /*504  17*/
 
 
 typedef int  bases_t [M];
 
+int f [M*T+1];
 
 void bases_init(bases_t a);
 
@@ -26,11 +27,11 @@ int bases_equal(bases_t a, bases_t b);
 
 void bases_add (bases_t a, bases_t b, bases_t c);
 
-void bases_mul (bases_t a, bases_t b, bases_t c, int *f);
+void bases_mul (bases_t a, bases_t b, bases_t c);
 
 void bases_mul_F (int* f);
 
-int bases_mul_F_uv (bases_t u, bases_t v, int* f);
+int bases_mul_F_uv (bases_t u, bases_t v);
 
 void bases_mul_left_shift(int * tab);
 

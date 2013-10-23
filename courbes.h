@@ -32,4 +32,6 @@ void double_point_CE (ptr_curve_t E, ptr_point_t A, ptr_point_t AA);
 
 void multiple_point_CE (ptr_curve_t E, ptr_point_t A, bases_t k, ptr_point_t C);
 
+void init_data_curve (ptr_point_t G, ptr_curve_t E);
+
 #endif /* COURBES_H_ */

@@ -134,3 +134,37 @@ void multiple_point_CE (ptr_curve_t E, ptr_point_t A, bases_t k, ptr_point_t C)
 	}
 	point_set_point(C,&Q);
 }//multiple_point_CE()
+
+void init_data_curve(ptr_point_t G, ptr_curve_t E)
+{
+	//initialisation de la matrice F (utiliser pour l'artihmetique de bases normale)
+	bases_mul_F(f);
+
+
+	//initialisation du point G
+
+	point_init(G);
+
+	mpz_t g_x, g_y;
+	mpz_init_set_str(g_x,"0311103c17167564ace77ccb09c681f886ba54ee8",16);
+	mpz_init_set_str(g_y,"333ac13c6447f2e67613bf7009daf98c87bb50c7f",16);
+
+	int_to_bases(g_x,G->_x);
+	int_to_bases(g_y,G->_y);
+
+	//point_print(&G,"G");
+
+	//initialisation de l'equation
+
+	bases_init(E->_a1);bases_init(E->_a2);bases_init(E->_a3);bases_init(E->_a4);bases_init(E->_a6);
+
+	mpz_t a1, a2, a6;
+	mpz_init_set_str(a6,"6645f3cacf1638e139c6cd13ef61734fbc9e3d9fb",16);
+	mpz_init_set_ui(a1,1);
+	mpz_init_set_ui(a2,1);
+
+	int_to_bases(a1,E->_a1);
+	int_to_bases(a2,E->_a2);
+	int_to_bases(a6,E->_a6);
+
+}//init_data_curve()

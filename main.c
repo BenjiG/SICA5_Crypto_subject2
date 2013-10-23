@@ -13,50 +13,16 @@
 #include "courbes.h"
 #include "sha_code.h"
 
+#define ERROR -1
+#define NERROR 0
 
-int main(void)
+int generate_key(ptr_curve_t E, ptr_point_t G, ptr_point_t Q, bases_t d_bases)
 {
-	//initialisation de la matrice F (utiliser pour l'artihmetique de bases normale)
-	bases_mul_F(f);
-
-
-	//initialisation du point G
-	point_t G;
-	point_init(&G);
-
-	mpz_t g_x, g_y;
-	mpz_init_set_str(g_x,"0311103c17167564ace77ccb09c681f886ba54ee8",16);
-	mpz_init_set_str(g_y,"333ac13c6447f2e67613bf7009daf98c87bb50c7f",16);
-
-	int_to_bases(g_x,G._x);
-	int_to_bases(g_y,G._y);
-
-	//point_print(&G,"G");
-
-	//initialisation de l'equation
-	curve_t E;
-	bases_init(E._a1);bases_init(E._a2);bases_init(E._a3);bases_init(E._a4);bases_init(E._a6);
-
-	mpz_t a1, a2, a6;
-	mpz_init_set_str(a6,"6645f3cacf1638e139c6cd13ef61734fbc9e3d9fb",16);
-	mpz_init_set_ui(a1,1);
-	mpz_init_set_ui(a2,1);
-
-	int_to_bases(a1,E._a1);
-	int_to_bases(a2,E._a2);
-	int_to_bases(a6,E._a6);
-
-
-	/**
-	 * 	Debut ECDSA -- curve
-	 *
-	 */
-	//initialisation n
 	mpz_t n;
 	mpz_init(n);
 	mpz_ui_pow_ui(n,2,M);
 
-	gmp_printf("%Zd\n",n);
+	//gmp_printf("%Zd\n",n);
 
 	gmp_randstate_t rand_stat;
 	gmp_randinit_default(rand_stat);
@@ -67,17 +33,111 @@ int main(void)
 
 	gmp_printf("%Zd\n",d);
 
-	bases_t d_bases;
+
 	bases_init(d_bases);
 	int_to_bases(d,d_bases);
 
+	point_init(Q);
+
+	multiple_point_CE(E,G,d_bases,Q);
+
+	//point_print(&Q,"Q");
+	char buffer [1024];
+	FILE *pub, *priv;
+	pub = fopen("./pub.key","w+");
+	if(pub != NULL){
+		bases_to_string(Q->_x,buffer);
+		fputs(buffer,pub);
+		fputs(";",pub);
+		bases_to_string(Q->_y,buffer);
+		fputs(buffer,pub);
+		fclose(pub);
+	}
+	else
+		return ERROR;
+
+	priv = fopen("./priv.key","w+");
+	if(priv != NULL){
+		bases_to_string(d_bases,buffer);
+		fputs(buffer,priv);
+		fclose(priv);
+	}
+	else
+		return ERROR;
+
+	return NERROR;
+}//generate_key()
+
+int read_key(ptr_point_t Q, bases_t d_bases)
+{
+	point_init(Q);
+	bases_init(d_bases);
+
+	char buffer [1024];
+	FILE *pub, *priv;
+	pub = fopen("./pub.key","r");
+	if(pub != NULL){
+		fgets(buffer,163,pub);
+		string_to_bases(Q->_x,buffer);
+		fgets("",1,pub);
+		fgets(buffer,163,pub);
+		string_to_bases(Q->_y,buffer);
+		fclose(pub);
+	}
+	else
+		return ERROR;
+
+	priv = fopen("./priv.key","r");
+	if(priv != NULL){
+		fgets(buffer,163,priv);
+		string_to_bases(d_bases,buffer);
+		fclose(priv);
+	}
+	else
+		return ERROR;
+
+	return NERROR;
+}//read_key()
+
+
+int get_key(ptr_curve_t E, ptr_point_t G, ptr_point_t Q, bases_t d_bases)
+{
+	if(fopen("./pub.key","r")!=NULL && fopen("./priv.key","r") != NULL)
+	{
+		return read_key(Q,d_bases);
+	}
+	else
+	{
+		return generate_key(E,G,Q,d_bases);
+	}
+}//get_key()
+
+
+
+
+int main(void)
+{
+	gmp_printf("Start ECDSA-sign \n");
+	//initialisation des données de la courbe (equation, point G, variable f utile au calcul de bases normale)
+	point_t G;
+	curve_t E;
+
 	point_t Q;
-	point_init(&Q);
+	bases_t d_bases;
+	mpz_t d;
 
-	multiple_point_CE(&E,&G,d_bases,&Q);
+	mpz_t n;
+	mpz_init(n);
+	mpz_ui_pow_ui(n,2,M);
 
-	point_print(&Q,"Q");
 
+
+	init_data_curve(&G,&E);
+	get_key(&E,&G,&Q,d_bases);
+
+
+
+	gmp_randstate_t rand_stat;
 	//k*G=(x1,y1) (un scalaire fois un point)
 	mpz_t k;
 	mpz_init(k);
@@ -117,7 +177,7 @@ int main(void)
 	mpz_invert(k_inv,k,n);
 	mpz_mul(r0,r,d);
 	//sha-256 de m
-	static unsigned char buffer[65];
+	static  char buffer[65];
 	sha256_file("/home/sanchez/workspace/SICA5_Crypto_subject2/sha_code.c",buffer);
 
 	printf("%s\n", buffer);
@@ -132,52 +192,9 @@ int main(void)
 
 	gmp_printf("%Zd\n",s);
 
+	gmp_printf("End ECDSA-sign \n");
 
-
-//	point_t P;
-//	point_init(&P);
-//
-//
-//	point_t Result;
-//	point_init(&Result);
-//
-//
-//
-//
-//	int i;
-//	for (i = 0; i < 163; ++i)
-//	{
-//		if(i % 7 == 0)
-//		{
-//			P._x[i] = 1;
-//			Q._x[i] = 1;
-//			P._y[i] = 1;
-//			Q._y[i] = 1;
-//		}
-//		else
-//		{
-//			P._x[i] = 0;
-//			Q._x[i] = 0;
-//			P._y[i] = 0;
-//			Q._y[i] = 0;
-//		}
-//	}
-//
-//	point_print(&P, "P");
-//	point_print(&Q, "Q");
-//	addition_point_CE(&E,&P,&Q,&Result);
-//	point_print(&Result, "R");
-//
-//	oppose_point_CE(&E,&P,&Result);
-//	point_print(&Result, "R");
-//	bases_t P_inv;
-//	bases_inverse(P._x,P_inv);
-//	bases_mul(P._x,P_inv,Result._x);
-//	bases_print(P._x);
-//	printf("\n");
-//	bases_print(P_inv);
-//	printf("\n");
-//	bases_print(Result._x);
-
+	gmp_printf("\n\nStart ECDSA-verify-sign \n");
+	gmp_printf("End ECDSA-verify-sign \n");
 	return EXIT_SUCCESS;
 }

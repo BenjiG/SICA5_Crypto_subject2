@@ -11,6 +11,8 @@
 #include <gmp.h>
 #include "point.h"
 #include "courbes.h"
+#include "sha_code.h"
+
 
 int main(void)
 {
@@ -72,11 +74,11 @@ int main(void)
 	point_t Q;
 	point_init(&Q);
 
-	multiple_point_CE(&E,&G,d_bases,M,&Q);
+	multiple_point_CE(&E,&G,d_bases,&Q);
 
 	point_print(&Q,"Q");
 
-
+	//k*G=(x1,y1) (un scalaire fois un point)
 	mpz_t k;
 	mpz_init(k);
 	mpz_urandomb(k,rand_stat,M);
@@ -90,54 +92,92 @@ int main(void)
 	point_t X;
 	point_init(&X);
 
-	multiple_point_CE(&E,&G,d_bases,M,&X);
+	multiple_point_CE(&E,&G,k_bases,&X);
 
 	point_print(&X,"X");
 
-	point_t P;
-	point_init(&P);
+	//r=x1 mod n (x1 est transformé en integer)
+	mpz_t x1, r;
+	mpz_init(x1);
+	mpz_init(r);
+	bases_to_int(X._x,x1);
+
+	mpz_mod_2exp(r,x1,M);
+
+	gmp_printf("r = x1 mod n, r = %Zd\n", r);
+
+	//s= k^-1(z+r*d) mod n (multiplication d'integers)
+	mpz_t k_inv, r0, r1, r2, s;
+	mpz_init(k_inv);
+	mpz_init(r0);
+	mpz_init(r1);
+	mpz_init(r2);
+	mpz_init(s);
+
+	mpz_invert(k_inv,k,n);
+	mpz_mul(r0,r,d);
+	//sha-256 de m
+	static unsigned char buffer[65];
+	sha256_file("/home/sanchez/workspace/SICA5_Crypto_subject2/sha_code.c",buffer);
+
+	printf("%s\n", buffer);
+
+	mpz_t z;
+	mpz_init_set_str(z,buffer,16);
+
+	//gmp_printf("%Zd\n",z);
+	mpz_add(r1,z,r0);
+	mpz_mul(r2,k_inv,r1);
+	mpz_mod_2exp(s,r2,M);
+
+	gmp_printf("%Zd\n",s);
 
 
-	point_t Result;
-	point_init(&Result);
 
-
-
-
-	int i;
-	for (i = 0; i < 163; ++i)
-	{
-		if(i % 7 == 0)
-		{
-			P._x[i] = 1;
-			Q._x[i] = 1;
-			P._y[i] = 1;
-			Q._y[i] = 1;
-		}
-		else
-		{
-			P._x[i] = 0;
-			Q._x[i] = 0;
-			P._y[i] = 0;
-			Q._y[i] = 0;
-		}
-	}
-
-	point_print(&P, "P");
-	point_print(&Q, "Q");
-	addition_point_CE(&E,&P,&Q,&Result);
-	point_print(&Result, "R");
-
-	oppose_point_CE(&E,&P,&Result);
-	point_print(&Result, "R");
-	bases_t P_inv;
-	bases_inverse(P._x,P_inv);
-	bases_mul(P._x,P_inv,Result._x);
-	bases_print(P._x);
-	printf("\n");
-	bases_print(P_inv);
-	printf("\n");
-	bases_print(Result._x);
+//	point_t P;
+//	point_init(&P);
+//
+//
+//	point_t Result;
+//	point_init(&Result);
+//
+//
+//
+//
+//	int i;
+//	for (i = 0; i < 163; ++i)
+//	{
+//		if(i % 7 == 0)
+//		{
+//			P._x[i] = 1;
+//			Q._x[i] = 1;
+//			P._y[i] = 1;
+//			Q._y[i] = 1;
+//		}
+//		else
+//		{
+//			P._x[i] = 0;
+//			Q._x[i] = 0;
+//			P._y[i] = 0;
+//			Q._y[i] = 0;
+//		}
+//	}
+//
+//	point_print(&P, "P");
+//	point_print(&Q, "Q");
+//	addition_point_CE(&E,&P,&Q,&Result);
+//	point_print(&Result, "R");
+//
+//	oppose_point_CE(&E,&P,&Result);
+//	point_print(&Result, "R");
+//	bases_t P_inv;
+//	bases_inverse(P._x,P_inv);
+//	bases_mul(P._x,P_inv,Result._x);
+//	bases_print(P._x);
+//	printf("\n");
+//	bases_print(P_inv);
+//	printf("\n");
+//	bases_print(Result._x);
 
 	return EXIT_SUCCESS;
 }

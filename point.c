@@ -15,6 +15,7 @@ void point_init (ptr_point_t Point)
 {
 	bases_init(Point->_x);
 	bases_init(Point->_y);
+	Point->_inf = 0;
 }//point_init()
 
 void point_print (ptr_point_t Point, char * name)
@@ -29,7 +30,7 @@ void point_print (ptr_point_t Point, char * name)
 
 int point_equal (ptr_point_t PointA, ptr_point_t PointB)
 {
-	return (bases_equal(PointA->_x,PointB->_x) && bases_equal(PointA->_y,PointB->_y));
+	return (bases_equal(PointA->_x,PointB->_x) && bases_equal(PointA->_y,PointB->_y) && (PointA->_inf == PointB->_inf));
 }//point_equal()
 
 //PointA = PointB
@@ -37,4 +38,5 @@ void point_set_point (ptr_point_t PointA, ptr_point_t PointB)
 {
 	bases_set_bases(PointA->_x, PointB->_x);
 	bases_set_bases(PointA->_y,PointB->_y);
+	PointA->_inf = PointB->_inf;
 }//point_set_point()

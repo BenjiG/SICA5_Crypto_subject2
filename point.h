@@ -11,6 +11,12 @@
 #include <gmp.h>
 #include "bases.h"
 
+
+typedef enum {
+		TRUE  = (1==1),
+		FALSE = (1==0),
+} bool_t;
+
 /**
  * @struct : point_type
  * @brief : define the type point_t
@@ -19,6 +25,7 @@
 typedef struct {
 	bases_t _x;
 	bases_t _y;
+	bool_t _inf;
 } point_t;
 
 typedef point_t* ptr_point_t;

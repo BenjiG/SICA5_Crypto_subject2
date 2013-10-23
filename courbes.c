@@ -49,17 +49,18 @@ void addition_point_CE (ptr_curve_t E, ptr_point_t A, ptr_point_t B, ptr_point_t
 
 	point_init(&O);
 	point_init(&B_opp);
+	O._inf = 1;
 	oppose_point_CE(E,B,&B_opp);
 //	bases_t O;
 //	bases_init(O);
 
-	if(point_equal(A,&O) == 1)
+	if(A->_inf == 1)
 	{
 		point_set_point(C,B);
 		//retourner B (x_b,y_b)
 		return;
 	}
-	if(point_equal(B,&O) == 1)
+	if(B->_inf == 1)
 	{
 		point_set_point(C,A);
 		//retourner A (x_a, y_a)
@@ -113,23 +114,21 @@ void double_point_CE (ptr_curve_t E, ptr_point_t A, ptr_point_t AA)
 }//double_point_CE()
 
 
-void multiple_point_CE (ptr_curve_t E, ptr_point_t A, int *n, int size_n, ptr_point_t C)
+void multiple_point_CE (ptr_curve_t E, ptr_point_t A, bases_t k, ptr_point_t C)
 {
-	//bases_print(n);
-	//printf("\n");
 	point_t Q, Q_temp;
 	point_init(&Q);
+	Q._inf = 1;
 	point_init(&Q_temp);
-	int i;
-	for(i = size_n-1; i >= 0; --i)
+	//point_set_point(&Q,A);
+	int i = 0;
+	for(i = M - 1; i >= 0; --i)
 	{
-		//Q <- 2Q
 		double_point_CE(E,&Q,&Q_temp);
 		point_set_point(&Q,&Q_temp);
-		if(n[i] == 1)
+		if(k[i] == 1)
 		{
-			//Q <- Q + P
-			addition_point_CE(E,&Q,A,&Q_temp);
+			addition_distinct_point_CE(E,&Q,A,&Q_temp);
 			point_set_point(&Q,&Q_temp);
 		}
 	}

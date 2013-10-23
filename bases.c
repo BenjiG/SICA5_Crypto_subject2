@@ -117,6 +117,7 @@ void bases_print(bases_t a)
 	for(i = 0; i < M; ++i)
 	{
 		printf("%d",a[i]);
+		if(i == M-1)printf(" \t%d",i);
 	}
 }//bases_print()
 

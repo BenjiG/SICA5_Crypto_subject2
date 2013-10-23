@@ -22,7 +22,7 @@ int generate_key(ptr_curve_t E, ptr_point_t G, ptr_point_t Q, bases_t d_bases)
 	mpz_init(n);
 	mpz_ui_pow_ui(n,2,M);
 
-	//gmp_printf("%Zd\n",n);
+	gmp_printf("%Zd\n",n);
 
 	gmp_randstate_t rand_stat;
 	gmp_randinit_default(rand_stat);
@@ -41,29 +41,32 @@ int generate_key(ptr_curve_t E, ptr_point_t G, ptr_point_t Q, bases_t d_bases)
 
 	multiple_point_CE(E,G,d_bases,Q);
 
+	bases_print(d_bases);
+	printf("\n");
+	point_print(Q,"Q");
 	//point_print(&Q,"Q");
-	char buffer [1024];
-	FILE *pub, *priv;
-	pub = fopen("./pub.key","w+");
-	if(pub != NULL){
-		bases_to_string(Q->_x,buffer);
-		fputs(buffer,pub);
-		fputs(";",pub);
-		bases_to_string(Q->_y,buffer);
-		fputs(buffer,pub);
-		fclose(pub);
-	}
-	else
-		return ERROR;
-
-	priv = fopen("./priv.key","w+");
-	if(priv != NULL){
-		bases_to_string(d_bases,buffer);
-		fputs(buffer,priv);
-		fclose(priv);
-	}
-	else
-		return ERROR;
+//	char buffer [1024];
+//	FILE *pub, *priv;
+//	pub = fopen("./pub.key","w+");
+//	if(pub != NULL){
+//		bases_to_string(Q->_x,buffer);
+//		fputs(buffer,pub);
+//		fputs(";",pub);
+//		bases_to_string(Q->_y,buffer);
+//		fputs(buffer,pub);
+//		fclose(pub);
+//	}
+//	else
+//		return ERROR;
+//
+//	priv = fopen("./priv.key","w+");
+//	if(priv != NULL){
+//		bases_to_string(d_bases,buffer);
+//		fputs(buffer,priv);
+//		fclose(priv);
+//	}
+//	else
+//		return ERROR;
 
 	return NERROR;
 }//generate_key()
@@ -77,11 +80,19 @@ int read_key(ptr_point_t Q, bases_t d_bases)
 	FILE *pub, *priv;
 	pub = fopen("./pub.key","r");
 	if(pub != NULL){
-		fgets(buffer,163,pub);
+		fgets(buffer,164,pub);
 		string_to_bases(Q->_x,buffer);
-		fgets("",1,pub);
-		fgets(buffer,163,pub);
+		printf("%s\n",buffer);
+		bases_print(Q->_x);
+		printf("\n%d\n",ftell(pub));
+		fseek(pub,165,SEEK_SET);
+		printf("\n%d\n",ftell(pub));
+
+		fgets(buffer,164,pub);
 		string_to_bases(Q->_y,buffer);
+		printf("%s\n",buffer);
+		bases_print(Q->_y);
+		printf("\n");
 		fclose(pub);
 	}
 	else
@@ -112,32 +123,17 @@ int get_key(ptr_curve_t E, ptr_point_t G, ptr_point_t Q, bases_t d_bases)
 	}
 }//get_key()
 
-
-
-
-int main(void)
+void ECDSA_sign_file (char * path, ptr_curve_t E, ptr_point_t G, ptr_point_t Q, bases_t d_bases)
 {
-	gmp_printf("Start ECDSA-sign \n");
-	//initialisation des données de la courbe (equation, point G, variable f utile au calcul de bases normale)
-	point_t G;
-	curve_t E;
-
-	point_t Q;
-	bases_t d_bases;
-	mpz_t d;
-
 	mpz_t n;
 	mpz_init(n);
 	mpz_ui_pow_ui(n,2,M);
 
-
-
-	init_data_curve(&G,&E);
-	get_key(&E,&G,&Q,d_bases);
-
-
+	mpz_t d;
+	bases_to_int(d_bases,d);
 
 	gmp_randstate_t rand_stat;
+	gmp_randinit_default(rand_stat);
 	//k*G=(x1,y1) (un scalaire fois un point)
 	mpz_t k;
 	mpz_init(k);
@@ -152,7 +148,7 @@ int main(void)
 	point_t X;
 	point_init(&X);
 
-	multiple_point_CE(&E,&G,k_bases,&X);
+	multiple_point_CE(E,G,k_bases,&X);
 
 	point_print(&X,"X");
 
@@ -178,7 +174,7 @@ int main(void)
 	mpz_mul(r0,r,d);
 	//sha-256 de m
 	static  char buffer[65];
-	sha256_file("/home/sanchez/workspace/SICA5_Crypto_subject2/sha_code.c",buffer);
+	sha256_file(path,buffer);
 
 	printf("%s\n", buffer);
 
@@ -191,6 +187,23 @@ int main(void)
 	mpz_mod_2exp(s,r2,M);
 
 	gmp_printf("%Zd\n",s);
+}
+
+
+int main(int argc, char **argv)
+{
+	gmp_printf("Start ECDSA-sign \n");
+	//initialisation des données de la courbe (equation, point G, variable f utile au calcul de bases normale)
+	point_t G;
+	curve_t E;
+
+	point_t Q;
+	bases_t d_bases;
+
+	init_data_curve(&G,&E);
+	get_key(&E,&G,&Q,d_bases);
+
+	ECDSA_sign_file(/*argv[0]*/"/home/sanchez/workspace/SICA5_Crypto_subject2/main.c",&E,&G,&Q,d_bases);
 
 	gmp_printf("End ECDSA-sign \n");
 

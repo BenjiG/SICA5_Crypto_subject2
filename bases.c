@@ -117,7 +117,7 @@ void bases_print(bases_t a)
 	for(i = 0; i < M; ++i)
 	{
 		printf("%d",a[i]);
-		if(i == M-1)printf(" \t%d",i);
+		//if(i == M-1)printf(" \t%d",i);
 	}
 }//bases_print()
 
@@ -151,14 +151,14 @@ void string_to_bases(bases_t a, char *str)
 
 void bases_to_int(bases_t bases, mpz_t integer)
 {
-	char str [1024];
+	char str [M];
 	bases_to_string(bases,str);
 	string_to_int(str,integer);
 }//bases_to_int()
 
 void int_to_bases(mpz_t integer, bases_t bases)
 {
-	char str [1024];
+	char str [M];
 	int_to_string(integer,str);
 	string_to_bases(bases,str);
 }//int_to_bases()

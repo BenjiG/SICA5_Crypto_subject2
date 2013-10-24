@@ -128,7 +128,7 @@ void multiple_point_CE (ptr_curve_t E, ptr_point_t A, bases_t k, ptr_point_t C)
 		point_set_point(&Q,&Q_temp);
 		if(k[i] == 1)
 		{
-			addition_distinct_point_CE(E,&Q,A,&Q_temp);
+			addition_point_CE(E,&Q,A,&Q_temp);
 			point_set_point(&Q,&Q_temp);
 		}
 	}
@@ -168,3 +168,34 @@ void init_data_curve(ptr_point_t G, ptr_curve_t E)
 	int_to_bases(a6,E->_a6);
 
 }//init_data_curve()
+
+void multiple_addition_point_CE(ptr_curve_t E, bases_t g_bases, ptr_point_t G, bases_t q_bases, ptr_point_t Q, ptr_point_t GQ, ptr_point_t R)
+{
+	point_t tmp, tmp_temp;
+	point_init(&tmp);
+	tmp._inf = 1;
+	point_init(&tmp_temp);
+	//point_set_point(&Q,A);
+	int i = 0;
+	for(i = M - 1; i >= 0; --i)
+	{
+		double_point_CE(E,&tmp,&tmp_temp);
+		point_set_point(&tmp,&tmp_temp);
+		if(g_bases[i] == 1 && q_bases[i] == 0)
+		{
+			addition_point_CE(E,&tmp,G,&tmp_temp);
+			point_set_point(&tmp,&tmp_temp);
+		}
+		else if(g_bases[i] == 0 && q_bases[i] == 1)
+		{
+			addition_point_CE(E,&tmp,Q,&tmp_temp);
+			point_set_point(&tmp,&tmp_temp);
+		}
+		else
+		{
+			addition_point_CE(E,&tmp,GQ,&tmp_temp);
+			point_set_point(&tmp,&tmp_temp);
+		}
+	}
+	point_set_point(R,&tmp);
+}//multiple_addition_point_CE()

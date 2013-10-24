@@ -22,10 +22,10 @@ void point_print (ptr_point_t Point, char * name)
 {
 	printf("%s ( X = [",name);
 	bases_print(Point->_x);
-	printf("%d];",Point->_x[162]);
+	printf("];");
 	printf(" Y = [");
 	bases_print(Point->_y);
-	printf("%d])\n",Point->_y[162]);
+	printf(")\n");
 }//point_print()
 
 int point_equal (ptr_point_t PointA, ptr_point_t PointB)
